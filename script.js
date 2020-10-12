@@ -16,6 +16,7 @@ const snake = {
     { x: 60, y: 60 },
     { x: 40, y: 60 },
     { x: 20, y: 60 },
+    { x: 20, y: 60 },
   ],
 };
 
@@ -26,17 +27,42 @@ const apple = {
 
 function drawCanvas() {
   canvasContext.fillStyle = "black";
-  canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+  let rowOffset = true;
+  for (let i = 0; i < canvas.height; i+=20) {
+      let columnOffset = true;
+      for (let j = 0; j < canvas.width; j+=20) {
+        canvasContext.fillStyle = rowOffset ? (columnOffset ? 'gray' : 'black') : (columnOffset ? 'black' : 'gray');
+        canvasContext.fillRect(j, i, canvas.width, 20);       
+        columnOffset = !columnOffset;   
+      }        
+      rowOffset = !rowOffset;  
+  }
 }
 
 function moveSnake() {
-  for (let i = snake.body.length - 1; i > 0; i--) {
-    const xPositionIsGridLengthApart = snake.body[i].x - snake.body[i - 1].x === GRID_SIZE;
-    const yPositionIsGridLengthApart = snake.body[i].y - snake.body[i - 1].y === GRID_SIZE;
-      if (xPositionIsGridLengthApart || yPositionIsGridLengthApart) {
+
+  if (snake.newDirection) {
+    if (snake.body[0].x % 20 === 0 && snake.body[0].y % 20 === 0) {
+        snake.direction = snake.newDirection;
+        snake.newDirection = null;
+    }
+  }
+
+  const xPositionIsGridLengthApart = Math.abs(snake.body[1].x - snake.body[0].x) === GRID_SIZE;
+  const yPositionIsGridLengthApart = Math.abs(snake.body[1].y - snake.body[0].y) === GRID_SIZE;
+  if (xPositionIsGridLengthApart || yPositionIsGridLengthApart) {
+    for (let i = snake.body.length - 2; i > 1; i--) {
         snake.body[i] = Object.assign({}, snake.body[i - 1]);
-      }
-    snake.body[i] = Object.assign({}, snake.body[i - 1]);
+    }
+
+    snake.body[1] = Object.assign({}, snake.body[0]);
+  }
+
+  if (snake.body[snake.body.length - 1].x === snake.body[snake.body.length - 2].x) {
+    snake.body[snake.body.length - 1].y += 1;
+  }
+  if (snake.body[snake.body.length - 1].y === snake.body[snake.body.length - 2].y) {
+    snake.body[snake.body.length - 1].x += 1;
   }
 
   switch (snake.direction) {
@@ -53,15 +79,11 @@ function moveSnake() {
       snake.body[0].y += 1;
       break;
   }
-
-  const xPositionIsGridLengthApart = Math.abs(snake.body[1].x - snake.body[0].x) === GRID_SIZE;
-  const yPositionIsGridLengthApart = Math.abs(snake.body[1].y - snake.body[0].y) === GRID_SIZE;
-  if ()
 }
 
 function drawSnake() {
   snake.body.forEach((bodyPart) => {
-    canvasContext.fillStyle = "green";
+    canvasContext.fillStyle = "#50C878";
     canvasContext.fillRect(bodyPart.x, bodyPart.y, GRID_SIZE, GRID_SIZE);
   });
 }
@@ -103,27 +125,27 @@ const gameLoopId = setInterval(() => {
   }
   drawApple();
   drawSnake();
-}, 1000);
+}, 25);
 
 document.addEventListener("keydown", (e) => {
   console.log(e);
   console.log(e.key);
   switch (e.key) {
     case "ArrowRight":
-      if (direction === DIRECTION_LEFT) return;
-      snake.direction = DIRECTION_RIGHT;
+      if (snake.direction === DIRECTION_LEFT) return;
+      snake.newDirection = DIRECTION_RIGHT;
       break;
     case "ArrowLeft":
-      if (direction === DIRECTION_RIGHT) return;
-      snake.direction = DIRECTION_LEFT;
+      if (snake.direction === DIRECTION_RIGHT) return;
+      snake.newDirection = DIRECTION_LEFT;
       break;
     case "ArrowDown":
-      if (direction === DIRECTION_UP) return;
-      snake.direction = DIRECTION_DOWN;
+      if (snake.direction === DIRECTION_UP) return;
+      snake.newDirection = DIRECTION_DOWN;
       break;
     case "ArrowUp":
-      if (direction === DIRECTION_DOWN) return;
-      snake.direction = DIRECTION_UP;
+      if (snake.direction === DIRECTION_DOWN) return;
+      snake.newDirection = DIRECTION_UP;
       break;
   }
 });
