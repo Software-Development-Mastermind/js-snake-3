@@ -37,7 +37,6 @@ const SnakeLogic = (function () {
   };
 
   const getNewTailPosition = (snake) => {
-    // create a deep copy of snake tail
     const snakeTail = Object.assign({}, snake.body[snake.body.length - 1]);
     const snakeTailParent = snake.body[snake.body.length - 2];
     if (
