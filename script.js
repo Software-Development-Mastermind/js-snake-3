@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", (e) => {
 
   const gameLoopId = setInterval(() => {
     CanvasLogic.drawCanvas(canvasContext, GRID_SIZE);
-    moveSnake();
+    SnakeLogic.moveBody(snake, Math, GRID_SIZE);
 
     if (GameLogic.isSnakeCollidingWithWall(snake, canvas)) {
       clearInterval(gameLoopId);
@@ -44,35 +44,6 @@ document.addEventListener("DOMContentLoaded", (e) => {
     CanvasLogic.drawApple(apple, canvasContext, GRID_SIZE);
     CanvasLogic.drawSnake(snake, canvasContext, GRID_SIZE);
   }, 10);
-
-  function moveSnake() {
-    const { direction, newDirection } = SnakeLogic.updateDirection(
-      snake,
-      GRID_SIZE
-    );
-    snake.direction = direction;
-    snake.newDirection = newDirection;
-
-    const xPositionIsGridLengthApart =
-      Math.abs(snake.body[1].x - snake.body[0].x) === GRID_SIZE;
-    const yPositionIsGridLengthApart =
-      Math.abs(snake.body[1].y - snake.body[0].y) === GRID_SIZE;
-    if (xPositionIsGridLengthApart || yPositionIsGridLengthApart) {
-      for (let i = snake.body.length - 2; i > 1; i--) {
-        snake.body[i] = Object.assign({}, snake.body[i - 1]);
-      }
-
-      snake.body[1] = Object.assign({}, snake.body[0]);
-    }
-
-    const newSnakeTail = SnakeLogic.getNewTailPosition(snake);
-    snake.body[snake.body.length - 1].x = newSnakeTail.x;
-    snake.body[snake.body.length - 1].y = newSnakeTail.y;
-
-    const newSnakeHead = SnakeLogic.getNewHeadPosition(snake);
-    snake.body[0].x = newSnakeHead.x;
-    snake.body[0].y = newSnakeHead.y;
-  }
 
   document.addEventListener("keydown", (e) => {
     switch (e.key) {
