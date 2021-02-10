@@ -88,8 +88,8 @@ const SnakeLogic = (function () {
 
   return {
     updateDirection,
-    moveBody,
     getNewTailPosition,
-    getNewHeadPosition
+    getNewHeadPosition,
+    moveBody
   };
 })();
